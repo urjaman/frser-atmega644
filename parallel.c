@@ -149,6 +149,9 @@ uint8_t parallel_test(void) {
 	DDRA &= ~_BV(3);
 	PORTA |= _BV(3);
 	uint8_t x=(F_CPU/1000000); // This results in 5microsecond maximum pullup wait since the loop is 5 cycles
+#if (defined FORCE_BUSTYPE) && (FORCE_BUSTYPE == CHIP_BUSTYPE_PARALLEL)
+	goto okexit;
+#endif
 	do {
 		if (PINA&_BV(3)) goto okexit; // Pullup works => parallel
 	} while (--x);

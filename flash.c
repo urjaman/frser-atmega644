@@ -94,7 +94,11 @@ uint8_t flash_plausible_protocols(void) {
 		}
 	}
 	flash_select_protocol(flash_prot_in_use);
+#ifdef FORCE_BUSTYPE
+	return FORCE_BUSTYPE;
+#else
 	return protocols;
+#endif
 }
 
 void flash_select_protocol(uint8_t allowed_protocols) {
