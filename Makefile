@@ -19,9 +19,9 @@
 ##
 
 PROJECT=frser-atmega644
-DEPS=uart.h frser.h udelay.h main.h parallel.h lpc.h flash.h fwh.h nibble.h Makefile xprint.h
+DEPS=uart.h libfrser/frser.h libfrser/frser-flashapi.h frser-cfg.h libfrser/udelay.h main.h parallel.h lpc.h flash.h fwh.h nibble.h Makefile xprint.h
 CIFACE_SOURCES=ciface.c console.c lib.c appdb.c commands.c
-SOURCES=main.c uart.c flash.c udelay.c frser.c parallel.c lpc.c spi.c fwh.c nibble.c xprint.c $(CIFACE_SOURCES)
+SOURCES=main.c uart.c flash.c libfrser/udelay.c libfrser/frser.c parallel.c lpc.c spi.c fwh.c nibble.c xprint.c $(CIFACE_SOURCES)
 CC=avr-gcc
 LD=avr-ld
 OBJCOPY=avr-objcopy
@@ -33,7 +33,7 @@ UISP=uisp_bbpg
 #AVRBINDIR=/usr/avr/bin/
 #AVRDUDECMD=avrdude -p m644p -c dt006 -E noreset
 # If using avr-gcc < 4.6.0, replace -flto with -combine
-CFLAGS=-mmcu=$(MMCU) -Os -mcall-prologues -Wl,--relax -fno-inline-small-functions -fno-tree-scev-cprop -fno-tree-switch-conversion -frename-registers -g -Wall -W -pipe -flto -fwhole-program -std=gnu99
+CFLAGS=-mmcu=$(MMCU) -Ilibfrser -Os -mcall-prologues -Wl,--relax -fno-inline-small-functions -fno-tree-scev-cprop -fno-tree-switch-conversion -frename-registers -g -Wall -W -pipe -flto -fwhole-program -std=gnu99
 
 
 all: $(PROJECT).out
