@@ -1,7 +1,7 @@
 /*
  * This file is part of the frser-atmega644 project.
  *
- * Copyright (C) 2009 Urja Rannikko <urjaman@gmail.com>
+ * Copyright (C) 2009,2015 Urja Rannikko <urjaman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,13 +18,17 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-uint8_t spi_test(void);
-uint8_t spi_read(uint32_t addr);
-void spi_readn(uint32_t addr, uint32_t len);
-void spi_spiop(uint32_t sbytes, uint32_t rbytes);
-uint8_t spi_uninit(void);
+#ifndef _SPIHW_H_
+#define _SPIHW_H_
+
+/* This will give spi_set_speed if needed. A bit illogically maybe, but anyways... */
+#include "frser-flashapi.h"
+
+void spi_select(void);
+void spi_deselect(void);
+uint8_t spi_txrx(const uint8_t c);
+void spi_init(void);
 void spi_init_cond(void);
-uint32_t spi_set_speed(uint32_t hz);
-uint8_t spi_probe_rdid(uint8_t *id);
-uint8_t spi_probe_rems(uint8_t *id);
-uint8_t spi_probe_res(uint8_t *id);
+uint8_t spi_uninit(void);
+
+#endif

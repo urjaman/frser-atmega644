@@ -23,7 +23,7 @@
 #include "uart.h"
 #include "parallel.h"
 #include "lpc.h"
-#include "spi.h"
+#include "spilib.h"
 #include "frser.h"
 #include "fwh.h"
 #include "nibble.h"

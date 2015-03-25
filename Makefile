@@ -19,9 +19,9 @@
 ##
 
 PROJECT=frser-atmega644
-DEPS=uart.h libfrser/frser.h libfrser/frser-flashapi.h frser-cfg.h libfrser/udelay.h main.h parallel.h lpc.h flash.h fwh.h nibble.h Makefile xprint.h
+DEPS=uart.h libfrser/frser.h libfrser/frser-flashapi.h frser-cfg.h libfrser/udelay.h libfrser/spilib.h main.h parallel.h lpc.h flash.h fwh.h nibble.h Makefile xprint.h spihw.h
 CIFACE_SOURCES=ciface.c console.c lib.c appdb.c commands.c
-SOURCES=main.c uart.c flash.c libfrser/udelay.c libfrser/frser.c parallel.c lpc.c spi.c fwh.c nibble.c xprint.c $(CIFACE_SOURCES)
+SOURCES=main.c uart.c flash.c libfrser/udelay.c libfrser/frser.c parallel.c lpc.c libfrser/spilib.c spihw.c fwh.c nibble.c xprint.c $(CIFACE_SOURCES)
 CC=avr-gcc
 LD=avr-ld
 OBJCOPY=avr-objcopy
