@@ -27,7 +27,7 @@ LD=avr-ld
 OBJCOPY=avr-objcopy
 MMCU=atmega644p
 BTLOADERADDR=0xFC00
-SERIAL_DEV=/dev/ttyUSB0
+SERIAL_DEV ?= /dev/ttyUSB1
 UISP=uisp_bbpg
 
 #AVRBINDIR=/usr/avr/bin/
@@ -43,14 +43,14 @@ $(PROJECT).hex: $(PROJECT).out
 
 $(PROJECT).bin: $(PROJECT).out
 	$(AVRBINDIR)$(OBJCOPY) -j .text -j .data -O binary $(PROJECT).out $(PROJECT).bin
- 
+
 $(PROJECT).out: $(SOURCES) $(DEPS)
 	$(AVRBINDIR)$(CC) -DBTLOADERADDR=$(BTLOADERADDR) $(CFLAGS) -I./ -o $(PROJECT).out $(SOURCES)
 	$(AVRBINDIR)avr-size $(PROJECT).out
-	
+
 asm: $(SOURCES) $(DEPS)
 	$(AVRBINDIR)$(CC) $(CFLAGS) -S  -I./ -o $(PROJECT).s $(SOURCES)
-	
+
 
 #program: $(PROJECT).hex
 #	$(AVRBINDIR)$(AVRDUDECMD) -U flash:w:$(PROJECT).hex
@@ -66,7 +66,7 @@ clean:
 	rm -f *.o
 	rm -f boot.out boot.hex
 	rm -f serialprogrammer
-	
+
 backup:
 	$(AVRBINDIR)$(AVRDUDECMD) -U flash:r:backup.bin:r
 
