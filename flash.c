@@ -22,10 +22,9 @@
 #include "flash.h"
 #include "uart.h"
 #include "parallel.h"
-#include "lpc.h"
 #include "spilib.h"
 #include "frser.h"
-#include "fwh.h"
+#include "lpcfwh.h"
 #include "nibble.h"
 
 static uint8_t flash_prot_in_use=0;
@@ -78,20 +77,26 @@ uint8_t flash_plausible_protocols(void) {
 		protocols &= ~CHIP_BUSTYPE_PARALLEL;
 	}
 	flash_portclear();
-	if (protocols&CHIP_BUSTYPE_LPC) {
-		if (!lpc_test()) {
-			protocols &= ~CHIP_BUSTYPE_LPC;
-		} else { // if lpc test passes, it certainly is not SPI chip that is attached.
-			protocols &= ~CHIP_BUSTYPE_SPI;
+	if (!parallel_test()) {
+		if (protocols&CHIP_BUSTYPE_LPC) {
+			if (!lpc_test()) {
+				protocols &= ~CHIP_BUSTYPE_LPC;
+			} else { // if lpc test passes, it certainly is not SPI chip that is attached.
+				protocols &= ~CHIP_BUSTYPE_SPI;
+			}
 		}
-	}
-	flash_portclear();
-	if (protocols&CHIP_BUSTYPE_FWH) {
-		if (!fwh_test()) {
-			protocols &= ~CHIP_BUSTYPE_FWH;
-		} else { // Same here, if fwh then not spi.
-			protocols &= ~CHIP_BUSTYPE_SPI;
+		flash_portclear();
+		if (protocols&CHIP_BUSTYPE_FWH) {
+			if (!fwh_test()) {
+				protocols &= ~CHIP_BUSTYPE_FWH;
+			} else { // Same here, if fwh then not spi.
+				protocols &= ~CHIP_BUSTYPE_SPI;
+			}
 		}
+	} else {
+		/* Parallel test passed so it isnt FWH or LPC. */
+		protocols &= ~CHIP_BUSTYPE_LPC;
+		protocols &= ~CHIP_BUSTYPE_FWH;
 	}
 	flash_select_protocol(flash_prot_in_use);
 #ifdef FORCE_BUSTYPE
@@ -115,14 +120,16 @@ void flash_select_protocol(uint8_t allowed_protocols) {
 		return;
 	}
 	flash_portclear();
-	if ((allowed_protocols&CHIP_BUSTYPE_LPC)&&(lpc_test())) {
-		flash_prot_in_use = CHIP_BUSTYPE_LPC;
-		return;
-	}
-	flash_portclear();
-	if ((allowed_protocols&CHIP_BUSTYPE_FWH)&&(fwh_test())) {
-		flash_prot_in_use = CHIP_BUSTYPE_FWH;
-		return;
+	if (!parallel_test()) { // lpcfwh.c lpc and fwh tests dont know of our parallel <> lpc/fwh test.
+		if ((allowed_protocols&CHIP_BUSTYPE_LPC)&&(lpc_test())) {
+			flash_prot_in_use = CHIP_BUSTYPE_LPC;
+			return;
+		}
+		flash_portclear();
+		if ((allowed_protocols&CHIP_BUSTYPE_FWH)&&(fwh_test())) {
+			flash_prot_in_use = CHIP_BUSTYPE_FWH;
+			return;
+		}
 	}
 	flash_prot_in_use = 0;
 	return;

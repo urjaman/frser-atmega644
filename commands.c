@@ -26,10 +26,8 @@
 #include "flash.h"
 #include "ciface.h"
 #include "spilib.h"
-#include "lpc.h"
 #include "parallel.h"
-#include "lpc.h"
-#include "fwh.h"
+#include "lpcfwh.h"
 #include "frser.h"
 
 static void sendcrlf(void) {

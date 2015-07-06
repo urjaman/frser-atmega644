@@ -19,22 +19,25 @@
 ##
 
 PROJECT=frser-atmega644
-DEPS=uart.h libfrser/frser.h libfrser/frser-flashapi.h frser-cfg.h libfrser/udelay.h libfrser/spilib.h main.h parallel.h lpc.h flash.h fwh.h nibble.h Makefile xprint.h spihw.h
+DEPS=uart.h main.h parallel.h flash.h Makefile xprint.h
 CIFACE_SOURCES=ciface.c console.c lib.c appdb.c commands.c
-SOURCES=main.c uart.c flash.c libfrser/udelay.c libfrser/frser.c parallel.c lpc.c libfrser/spilib.c spihw.c fwh.c nibble.c xprint.c $(CIFACE_SOURCES)
+SOURCES=main.c uart.c flash.c parallel.c spihw.c xprint.c $(CIFACE_SOURCES)
 CC=avr-gcc
 LD=avr-ld
 OBJCOPY=avr-objcopy
 MMCU=atmega644p
 BTLOADERADDR=0xFC00
-SERIAL_DEV ?= /dev/ttyUSB1
+SERIAL_DEV ?= /dev/ttyUSB0
 UISP=uisp_bbpg
 
 #AVRBINDIR=/usr/avr/bin/
 #AVRDUDECMD=avrdude -p m644p -c dt006 -E noreset
 # If using avr-gcc < 4.6.0, replace -flto with -combine
-CFLAGS=-mmcu=$(MMCU) -Ilibfrser -Os -mcall-prologues -Wl,--relax -fno-inline-small-functions -fno-tree-scev-cprop -fno-tree-switch-conversion -frename-registers -g -Wall -W -pipe -flto -fwhole-program -std=gnu99
+CFLAGS=-mmcu=$(MMCU) -Os -mcall-prologues -Wl,--relax -fno-inline-small-functions -fno-tree-scev-cprop -fno-tree-switch-conversion -frename-registers -g -Wall -W -pipe -flto -fwhole-program -std=gnu99
 
+include libfrser/Makefile.frser
+include libfrser/Makefile.spilib
+include libfrser/Makefile.lpcfwh
 
 all: $(PROJECT).out
 
@@ -45,11 +48,11 @@ $(PROJECT).bin: $(PROJECT).out
 	$(AVRBINDIR)$(OBJCOPY) -j .text -j .data -O binary $(PROJECT).out $(PROJECT).bin
 
 $(PROJECT).out: $(SOURCES) $(DEPS)
-	$(AVRBINDIR)$(CC) -DBTLOADERADDR=$(BTLOADERADDR) $(CFLAGS) -I./ -o $(PROJECT).out $(SOURCES)
+	$(AVRBINDIR)$(CC) -DBTLOADERADDR=$(BTLOADERADDR) $(CFLAGS) -I. -o $(PROJECT).out $(SOURCES)
 	$(AVRBINDIR)avr-size $(PROJECT).out
 
 asm: $(SOURCES) $(DEPS)
-	$(AVRBINDIR)$(CC) $(CFLAGS) -S  -I./ -o $(PROJECT).s $(SOURCES)
+	$(AVRBINDIR)$(CC) $(CFLAGS) -S  -I. -o $(PROJECT).s $(SOURCES)
 
 
 #program: $(PROJECT).hex

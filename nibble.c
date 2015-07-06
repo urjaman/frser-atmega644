@@ -64,8 +64,6 @@ void nibble_write(uint8_t data) {
 #define clock_low() do { CLK_PORT &= ~_BV(CLK); } while(0)
 #define clock_high() do { CLK_PORT |= _BV(CLK); } while(0)
 
-
-
 bool nibble_init(void) {
 	uint8_t i;
 
@@ -124,26 +122,6 @@ void nibble_start(uint8_t start) {
 	FRAME_PORT |= _BV(FRAME);
 }
 
-bool nibble_ready_sync(void) {
-	uint8_t nib;
-	uint8_t x=32;
-	do {
-		nib = clocked_nibble_read();
-		if (!(x--)) return false;
-	} while (nib != 0);
-	return true;
-}
-
-uint8_t byte_read(void) {
-	return clocked_nibble_read()
-	| (clocked_nibble_read() << 4);
-}
-
-void byte_write(uint8_t byte) {
-	clocked_nibble_write(byte);
-	clocked_nibble_write_hi(byte);
-}
-
 void nibble_hw_init(void) {
 	uint8_t x;
 	// !RST = A16 = PB1 => 1
@@ -179,4 +157,9 @@ void nibble_hw_init(void) {
 	DDRB |= (_BV(1)|_BV(6));
 	PORTC |= _BV(7);
 	DDRC |= _BV(7);
+	/* Kick teh RST. */
+	PORTB &= ~_BV(1); //!RST
+	_delay_us(1);
+	PORTB |= _BV(1);
+
 }
